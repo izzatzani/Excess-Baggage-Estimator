@@ -3,7 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(const BaggageApp());
 
-// ====== EDIT THESE WITH YOUR OWN DETAILS ======
+// ======OWN DETAILS ======
 const String kAppTitle = 'Excess Baggage Estimator';
 const String kAuthorName = 'IZZAT IZZANI BIN MOHD NASIR';
 const String kMatricNo = '2025219938';
@@ -236,18 +236,33 @@ class AppDrawer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(35),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.flight_takeoff_rounded,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
+            Container(
+            padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(40),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.asset(
+            'assets/icon.png',
+            width: 40,
+            height: 40,
+            errorBuilder: (context, error, stack) => const Icon(
+              Icons.luggage_rounded,
+              color: AppColors.lightPrimary,
+              size: 32,
+            ),
+          ),
+        ),
+      ),
                 const SizedBox(height: 14),
                 const Text(
                   kAppTitle,
@@ -364,13 +379,16 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  String? _validatePositive(String? value, String label) {
+  String? _validatePositive(String? value, String label, {double? max}) {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter $label';
     }
     final n = double.tryParse(value.trim());
     if (n == null) return 'Enter a valid number (e.g. 25 or 25.5)';
     if (n < 0) return '$label cannot be negative';
+    if (max != null && n > max) {
+      return '$label cannot exceed ${max.toStringAsFixed(0)} kg';
+    }
     return null;
   }
 
@@ -398,11 +416,27 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => Scaffold.of(ctx).openDrawer(),
           ),
         ),
-        actions: const [
-          ThemeToggleButton(),
+        actions: [
+          const ThemeToggleButton(),
           Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: Icon(Icons.flight_takeoff_rounded),
+            padding: const EdgeInsets.only(right: 12),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Image.asset(
+                'assets/icon.png',
+                width: 24,
+                height: 24,
+                errorBuilder: (context, error, stack) => const Icon(
+                  Icons.luggage_rounded,
+                  color: AppColors.lightPrimary,
+                  size: 20,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -507,15 +541,13 @@ class _HomePageState extends State<HomePage> {
                       // Input 1: weight (TextField)
                       TextFormField(
                         controller: _weightCtrl,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         decoration: const InputDecoration(
                           labelText: 'Baggage weight (kg)',
                           prefixIcon: Icon(Icons.luggage_rounded),
-                          helperText: 'Weight of your checked baggage',
+                          helperText: 'Weight of your checked baggage (max 32 kg)',
                         ),
-                        validator: (v) =>
-                            _validatePositive(v, 'baggage weight'),
+                        validator: (v) => _validatePositive(v, 'baggage weight', max: 32),
                       ),
                       const SizedBox(height: 16),
 
